@@ -9,7 +9,7 @@
  * @license For private project or commercial purposes contact us at: license.mirotalk@gmail.com or purchase it directly via Code Canyon:
  * @license https://codecanyon.net/item/mirotalk-c2c-webrtc-real-time-cam-2-cam-video-conferences-and-screen-sharing/43383005
  * @author  Miroslav Pejic - miroslav.pejic.85@gmail.com
- * @version 1.1.55
+ * @version 1.1.54
  */
 
 const roomId = new URLSearchParams(window.location.search).get('room');
@@ -40,6 +40,7 @@ const videoSource = document.getElementById('videoSource');
 const videoQualitySelect = document.getElementById('videoQualitySelect');
 const videoFpsDiv = document.getElementById('videoFpsDiv');
 const videoFpsSelect = document.getElementById('videoFpsSelect');
+const videoBitrateSelect = document.getElementById('videoBitrateSelect');
 const maxVideoQualityDiv = document.getElementById('maxVideoQualityDiv');
 const pushToTalkDiv = document.getElementById('pushToTalkDiv');
 const switchMaxVideoQuality = document.getElementById('switchMaxVideoQuality');
@@ -191,6 +192,10 @@ let myAudioStatusIcon;
 
 let videoQualitySelectedIndex = 0;
 let videoFpsSelectedIndex = 0;
+let videoBitrateSelectedIndex = 0;
+
+const defaultVideoBitrate = 2 * 1000 * 1000;
+let videoBitrate = defaultVideoBitrate;
 
 let surveyURL = false;
 let redirectURL = false;
@@ -421,6 +426,22 @@ async function handleRTCDataChannels(peerId) {
 
 function handleOnTrack(peerId, peers) {
     peerConnections[peerId].ontrack = (event) => {
+
+        let videoSender = peerConnections[peerId].getSenders()
+            .find((s) => (s.track ? s.track.kind === 'video' : false));
+
+        if(videoSender)
+        {
+            const parameters = videoSender.getParameters();
+            const encoding = parameters.encodings[0];
+            const bitrate = encoding.maxBitrate;
+
+            encoding.maxBitrate = videoBitrate;
+            videoSender.setParameters(parameters);
+        }
+
+
+
         console.log('Handle on track event', event);
         if (event.track.kind === 'video') {
             setRemoteMedia(event.streams[0], peers, peerId);
@@ -843,6 +864,11 @@ function handleEvents() {
     videoFpsSelect.onchange = (e) => {
         refreshVideoConstraints();
     };
+    videoBitrateSelect.onchange = (e) => {
+        refreshVideoConstraints();
+    };
+
+
     //switchMaxVideoQuality.checked = localStorageConfig.video.settings.best_quality;
     switchMaxVideoQuality.onchange = (e) => {
         localStorageConfig.video.settings.best_quality = e.currentTarget.checked;
@@ -1074,6 +1100,7 @@ function getVideoConstraints(deviceId = false) {
 
     elemDisable(videoQualitySelect, localStorageConfig.video.settings.best_quality);
     elemDisable(videoFpsSelect, localStorageConfig.video.settings.best_quality);
+    elemDisable(videoBitrateSelect, localStorageConfig.video.settings.best_quality);
 
     if (localStorageConfig.video.settings.best_quality) {
         resetVideoConstraints();
@@ -1085,6 +1112,7 @@ function getVideoConstraints(deviceId = false) {
     } else {
         const videoQuality = videoQualitySelect.value;
         const videoFrameRate = videoFpsSelect.value === 'default' ? 30 : parseInt(videoFpsSelect.value, 10);
+        const videoBitrateValue = videoBitrateSelect.value;
 
         const qualityMap = {
             default: { width: { ideal: 1280 }, height: { ideal: 720 } },
@@ -1098,7 +1126,18 @@ function getVideoConstraints(deviceId = false) {
             '8k': { width: { exact: 7680 }, height: { exact: 4320 } },
         };
 
+        const bitrateMap = {
+            default: defaultVideoBitrate,
+            '1M': 1 * 1000 * 1000,
+            '2M': 2 * 1000 * 1000,
+            '5M': 5 * 1000 * 1000,
+            '10M': 10 * 1000 * 1000,
+            '20M': 20 * 1000 * 1000,
+            '50M': 50 * 1000 * 1000,
+        };
+
         videoConstraints = qualityMap[videoQuality] || true;
+        videoBitrate = bitrateMap[videoBitrateValue] || defaultVideoBitrate;
 
         if (videoQuality === 'default') {
             videoFpsSelect.disabled = true;
@@ -1146,6 +1185,7 @@ function loadLocalStorageConfig() {
     videoSource.selectedIndex = localStorageConfig.video.devices.select.index;
     videoQualitySelect.selectedIndex = localStorageConfig.video.settings.quality_index;
     videoFpsSelect.selectedIndex = localStorageConfig.video.settings.fps_index;
+    videoBitrateSelect.selectedIndex = localStorageConfig.video.settings.bitrate_index;
     audioSource.selectedIndex = localStorageConfig.audio.devices.select.index;
     switchMaxVideoQuality.checked = localStorageConfig.video.settings.best_quality;
     switchKeepAspectRatio.checked = localStorageConfig.video.settings.aspect_ratio;
@@ -1249,6 +1289,7 @@ function setVideoButtons(active, e = false) {
 function resetVideoConstraints() {
     videoQualitySelect.selectedIndex = 0;
     videoFpsSelect.selectedIndex = 0;
+    videoBitrateSelect.selectedIndex = 0;
     localStorageConfig.video.settings.quality_index = 0;
     localStorageConfig.video.settings.fps_index = 0;
     saveLocalStorageConfig();
@@ -1263,15 +1304,19 @@ function refreshVideoConstraints() {
             refreshMyVideoStreamToPeers(localMediaStream);
             videoQualitySelectedIndex = videoQualitySelect.selectedIndex;
             videoFpsSelectedIndex = videoFpsSelect.selectedIndex;
+            videoBitrateSelectedIndex = videoBitrateSelect.selectedIndex;
             localStorageConfig.video.settings.quality_index = videoQualitySelectedIndex;
             localStorageConfig.video.settings.fps_index = videoFpsSelectedIndex;
+            localStorageConfig.video.settings.bitrate_index = videoBitrateSelectedIndex;
             saveLocalStorageConfig();
         })
         .catch((err) => {
             videoQualitySelect.selectedIndex = videoQualitySelectedIndex;
             videoFpsSelect.selectedIndex = videoFpsSelectedIndex;
+            videoBitrateSelect.selectedIndex = videoBitrateSelectedIndex;
             localStorageConfig.video.settings.quality_index = videoQualitySelectedIndex;
             localStorageConfig.video.settings.fps_index = videoFpsSelectedIndex;
+            localStorageConfig.video.settings.bitrate_index = videoBitrateSelectedIndex;
             saveLocalStorageConfig();
             console.error('refreshVideoConstraints', err);
             popupMessage(
@@ -1296,6 +1341,13 @@ function refreshMyVideoStreamToPeers(stream) {
         let videoSender = peerConnections[peerId]
             .getSenders()
             .find((s) => (s.track ? s.track.kind === 'video' : false));
+
+        const parameters = videoSender.getParameters();
+        const bitrate = parameters.encodings[0].maxBitrate;
+
+        parameters.encodings[0].maxBitrate = videoBitrate;
+        videoSender.setParameters(parameters);
+
         if (videoSender) videoSender.replaceTrack(stream.getVideoTracks()[0]);
     }
 }
