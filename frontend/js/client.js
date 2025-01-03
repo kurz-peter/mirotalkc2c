@@ -1309,7 +1309,7 @@ function resetVideoConstraints() {
 }
 
 function refreshVideoConstraints() {
-    if(localMediaStream.getVideoTracks().length > 0)
+    if(localMediaStream.getVideoTracks().length == 0)
     {
         popupMessage(
             'warning',
@@ -1317,35 +1317,37 @@ function refreshVideoConstraints() {
             "Your device doesn't support video input.",
         );
     }
-    localMediaStream
-        .getVideoTracks()[0]
-        .applyConstraints(getVideoConstraints(videoSource.value))
-        .then(() => {
-            logStreamSettingsInfo('refreshVideoConstraints', localMediaStream);
-            refreshMyVideoStreamToPeers(localMediaStream);
-            videoQualitySelectedIndex = videoQualitySelect.selectedIndex;
-            videoFpsSelectedIndex = videoFpsSelect.selectedIndex;
-            videoBitrateSelectedIndex = videoBitrateSelect.selectedIndex;
-            localStorageConfig.video.settings.quality_index = videoQualitySelectedIndex;
-            localStorageConfig.video.settings.fps_index = videoFpsSelectedIndex;
-            localStorageConfig.video.settings.bitrate_index = videoBitrateSelectedIndex;
-            saveLocalStorageConfig();
-        })
-        .catch((err) => {
-            videoQualitySelect.selectedIndex = videoQualitySelectedIndex;
-            videoFpsSelect.selectedIndex = videoFpsSelectedIndex;
-            videoBitrateSelect.selectedIndex = videoBitrateSelectedIndex;
-            localStorageConfig.video.settings.quality_index = videoQualitySelectedIndex;
-            localStorageConfig.video.settings.fps_index = videoFpsSelectedIndex;
-            localStorageConfig.video.settings.bitrate_index = videoBitrateSelectedIndex;
-            saveLocalStorageConfig();
-            console.error('refreshVideoConstraints', err);
-            popupMessage(
-                'warning',
-                'Video quality/fps',
-                "Your device doesn't support the selected video quality and fps, please select the another one.",
-            );
-        });
+    else {
+        localMediaStream
+            .getVideoTracks()[0]
+            .applyConstraints(getVideoConstraints(videoSource.value))
+            .then(() => {
+                logStreamSettingsInfo('refreshVideoConstraints', localMediaStream);
+                refreshMyVideoStreamToPeers(localMediaStream);
+                videoQualitySelectedIndex = videoQualitySelect.selectedIndex;
+                videoFpsSelectedIndex = videoFpsSelect.selectedIndex;
+                videoBitrateSelectedIndex = videoBitrateSelect.selectedIndex;
+                localStorageConfig.video.settings.quality_index = videoQualitySelectedIndex;
+                localStorageConfig.video.settings.fps_index = videoFpsSelectedIndex;
+                localStorageConfig.video.settings.bitrate_index = videoBitrateSelectedIndex;
+                saveLocalStorageConfig();
+            })
+            .catch((err) => {
+                videoQualitySelect.selectedIndex = videoQualitySelectedIndex;
+                videoFpsSelect.selectedIndex = videoFpsSelectedIndex;
+                videoBitrateSelect.selectedIndex = videoBitrateSelectedIndex;
+                localStorageConfig.video.settings.quality_index = videoQualitySelectedIndex;
+                localStorageConfig.video.settings.fps_index = videoFpsSelectedIndex;
+                localStorageConfig.video.settings.bitrate_index = videoBitrateSelectedIndex;
+                saveLocalStorageConfig();
+                console.error('refreshVideoConstraints', err);
+                popupMessage(
+                    'warning',
+                    'Video quality/fps',
+                    "Your device doesn't support the selected video quality and fps, please select the another one.",
+                );
+            });
+    }
 }
 
 function refreshMyLocalVideoStream(stream) {
