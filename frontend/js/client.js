@@ -280,8 +280,8 @@ function initClient() {
 }
 
 function updateCanvas() {
-    const randomColor1 = Math.floor(Math.random()*16777215).toString(16);
-    const randomColor2 = Math.floor(Math.random()*16777215).toString(16);
+    const randomColor1 = Math.floor(Math.random()*16777215).toString(16).padStart(6, "0");
+    const randomColor2 = Math.floor(Math.random()*16777215).toString(16).padStart(6, "0");
     let context = emptyVideoCanvas.getContext('2d');
     const grd = context.createLinearGradient(0, 0, 170, 0);
     grd.addColorStop(0, "#" + randomColor1);
