@@ -569,8 +569,6 @@ function setupLocalMedia(callback, errorBack) {
     }
     console.log('Requesting access to local audio/video inputs');
 
-    debugger;
-
     const audioDeviceId = localStorageConfig.audio.devices.select.id || audioSource.value;
     const videoDeviceId = localStorageConfig.video.devices.select.id || videoSource.value;
 
