@@ -575,11 +575,6 @@ function handleRemovePeer(config) {
     playSound('leave');
 }
 
-function addEmptyVideoTrack(stream)
-{
-
-}
-
 function setupLocalMedia(callback, errorBack) {
     if (localMediaStream != null) {
         if (callback) callback();
@@ -608,7 +603,10 @@ function setupLocalMedia(callback, errorBack) {
                     audio: audioConstraints,
                 })
                 .then((stream) => {
-                    stream.addTrack(emptyVideoCanvas.captureStream().getVideoTracks()[0]);
+                    let emptyVideoStream = emptyVideoCanvas.captureStream();
+                    let emptyVideoTracks = emptyVideoStream.getVideoTracks();
+                    let emptyVideoTrack = emptyVideoTracks[0];
+                    stream.addTrack(emptyVideoTrack);
                     setLocalMedia(stream);
                     if (callback) callback();
                 })
