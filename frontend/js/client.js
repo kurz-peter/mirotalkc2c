@@ -524,6 +524,7 @@ function handleSessionDescription(config) {
                     .createAnswer()
                     .then((localDescription) => {
                         console.log('Answer description is: ', localDescription);
+                        localDescription.sdp.replace('useinbandfec=1', 'useinbandfec=1; maxaveragebitrate=256000');
                         peerConnections[peerId]
                             .setLocalDescription(localDescription)
                             .then(() => {
