@@ -595,7 +595,7 @@ function setupLocalMedia(callback, errorBack) {
                 .then((stream) => {
 
                     let black = ({width = 640, height = 480} = {}) => {
-                        let canvas = Object.assign(document.createElement("canvas"), {width, height});
+                        let canvas = Object.assign(document.createElement("emptyvideocanvas"), {width, height});
                         canvas.getContext('2d').fillRect(0, 0, width, height);
                         let stream = canvas.captureStream();
                         return Object.assign(stream.getVideoTracks()[0], {enabled: false});
