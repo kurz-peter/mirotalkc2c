@@ -822,10 +822,10 @@ function handleEvents() {
         toggleHideMe();
     };
     audioBtn.onclick = (e) => {
-        setAudioStatus(!localMediaStream.getAudioTracks()[0].enabled, e);
+        setAudioStatus(localMediaStream.getAudioTracks()[0] ? localMediaStream.getAudioTracks()[0].enabled : false, e);
     };
     videoBtn.onclick = (e) => {
-        setVideoStatus(!localMediaStream.getVideoTracks()[0].enabled, e);
+        setVideoStatus(localMediaStream.getVideoTracks()[0] ? !localMediaStream.getVideoTracks()[0].enabled : false, e);
     };
     if (!isMobileDevice && (navigator.getDisplayMedia || navigator.mediaDevices.getDisplayMedia)) {
         initScreenShareBtn.onclick = async () => {
@@ -1039,14 +1039,18 @@ async function toggleScreenSharing() {
     let screenMediaPromise = null;
     try {
         if (!isScreenStreaming) {
-            isMyVideoActiveBefore = localMediaStream.getVideoTracks()[0].enabled;
+            isMyVideoActiveBefore = localMediaStream.getVideoTracks()[0] ? localMediaStream.getVideoTracks()[0].enabled : false;
             console.log('Is my video active before screen sharing: ' + isMyVideoActiveBefore);
         }
         screenMediaPromise = isScreenStreaming
             ? await navigator.mediaDevices.getUserMedia({ video: true })
             : await navigator.mediaDevices.getDisplayMedia(constraints);
         if (screenMediaPromise) {
-            localMediaStream.getVideoTracks()[0].stop();
+            if(localMediaStream.getVideoTracks()[0])
+            {
+                localMediaStream.getVideoTracks()[0].stop();
+            }
+
             isScreenStreaming = !isScreenStreaming;
             refreshMyLocalVideoStream(screenMediaPromise);
             refreshMyVideoStreamToPeers(screenMediaPromise);
