@@ -288,6 +288,7 @@ function updateCanvas() {
     grd.addColorStop(1, "#" + randomColor2);
     context.fillStyle = grd;
     context.fillRect(0, 0, 64, 64);
+    setTimeout(() => updateCanvas(), 1000);
 }
 
 function getEmptyVideoStream()
@@ -295,7 +296,7 @@ function getEmptyVideoStream()
     if(!emptyVideoStream)
     {
         emptyVideoStream = emptyVideoCanvas.captureStream();
-        setTimeout(() => updateCanvas(), 1000)
+        setTimeout(() => updateCanvas(), 1000);
     }
 
     return emptyVideoStream;
