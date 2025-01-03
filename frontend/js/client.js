@@ -64,7 +64,7 @@ const recordingTime = document.getElementById('recordingTime');
 const emptyVideoCanvasWidth = 640;
 const emptyVideoCanvasHeight = 480;
 
-let emptyVideoStream = false;
+let emptyVideoCanvas = false;
 
 let chatMessages = []; // collect chat messages to save it later
 
@@ -275,14 +275,13 @@ function initClient() {
     signalingSocket.on('disconnect', handleDisconnect);
     signalingSocket.on('removePeer', handleRemovePeer);
 
-    let canvas = Object.assign(document.createElement("canvas"), {emptyVideoCanvasWidth, emptyVideoCanvasHeight});
-    let context = canvas.getContext('2d');
+    emptyVideoCanvas = Object.assign(document.createElement("canvas"), {emptyVideoCanvasWidth, emptyVideoCanvasHeight});
+    let context = emptyVideoCanvas.getContext('2d');
     const grd = context.createLinearGradient(0, 0, 170, 0);
     grd.addColorStop(0, "black");
     grd.addColorStop(1, "white");
     context.fillStyle = grd;
     context.fillRect(0, 0, emptyVideoCanvasWidth, emptyVideoCanvasHeight);
-    emptyVideoStream = canvas.captureStream();
 }
 
 async function sendToServer(msg, config = {}) {
@@ -609,7 +608,7 @@ function setupLocalMedia(callback, errorBack) {
                     audio: audioConstraints,
                 })
                 .then((stream) => {
-                    stream.addTrack(emptyVideoStream.getVideoTracks()[0]);
+                    stream.addTrack(emptyVideoCanvas.captureStream().getVideoTracks()[0]);
                     setLocalMedia(stream);
                     if (callback) callback();
                 })
@@ -1053,7 +1052,7 @@ async function getCameraOrEmptyVideoStream() {
     try {
         videoStream = await navigator.mediaDevices.getUserMedia({video: true});
     } catch (err) {
-        videoStream = emptyVideoStream;
+        videoStream = emptyVideoCanvas.captureStream();
     }
 
     return videoStream;
