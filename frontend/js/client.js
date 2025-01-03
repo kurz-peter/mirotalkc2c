@@ -277,6 +277,8 @@ function initClient() {
     signalingSocket.on('peerStatus', handlePeerStatus);
     signalingSocket.on('disconnect', handleDisconnect);
     signalingSocket.on('removePeer', handleRemovePeer);
+
+    updateCanvas();
 }
 
 function updateCanvas() {
@@ -293,12 +295,7 @@ function updateCanvas() {
 
 function getEmptyVideoStream()
 {
-    if(!emptyVideoStream)
-    {
-        emptyVideoStream = emptyVideoCanvas.captureStream();
-        setTimeout(() => updateCanvas(), 1000);
-    }
-
+    emptyVideoStream = emptyVideoCanvas.captureStream();
     return emptyVideoStream;
 }
 
