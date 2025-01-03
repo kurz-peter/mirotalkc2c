@@ -598,11 +598,11 @@ function setupLocalMedia(callback, errorBack) {
                         let canvas = Object.assign(document.createElement("emptyvideocanvas"), {width, height});
                         canvas.getContext('2d').fillRect(0, 0, width, height);
                         let stream = canvas.captureStream();
-                        let emptyVideoTrack = Object.assign(stream.getVideoTracks()[0], {enabled: false});
-                        stream.addTrack(emptyVideoTrack)
+                        return Object.assign(stream.getVideoTracks()[0], {enabled: false});
+
                     }
 
-
+                    stream.addTrack(black);
 
                     setLocalMedia(stream);
                     if (callback) callback();
