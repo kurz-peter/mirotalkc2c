@@ -275,7 +275,9 @@ function initClient() {
     signalingSocket.on('disconnect', handleDisconnect);
     signalingSocket.on('removePeer', handleRemovePeer);
 
-    emptyVideoCanvas = Object.assign(document.createElement("canvas"), {emptyVideoCanvasWidth, emptyVideoCanvasHeight});
+    emptyVideoCanvas = document.createElement('canvas');
+    emptyVideoCanvas.width = emptyVideoCanvasWidth;
+    emptyVideoCanvas.height = emptyVideoCanvas.height;
     let context = emptyVideoCanvas.getContext('2d');
     const grd = context.createLinearGradient(0, 0, 170, 0);
     grd.addColorStop(0, "black");
