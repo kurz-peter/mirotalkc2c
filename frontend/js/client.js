@@ -287,7 +287,7 @@ function initClient() {
     grd.addColorStop(0, "black");
     grd.addColorStop(1, "white");
     context.fillStyle = grd;
-    context.fillRect(0, 0, emptyVideoCanvasWidth, emptyVideoCanvasHeight);
+    context.fillRect(0, 0, 64, 64);
 }
 
 async function sendToServer(msg, config = {}) {
