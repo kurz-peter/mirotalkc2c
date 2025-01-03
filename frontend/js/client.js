@@ -281,7 +281,11 @@ function initClient() {
 
 function getEmptyVideoStream()
 {
-    emptyVideoStream = emptyVideoCanvas.captureStream();
+    if(!emptyVideoStream)
+    {
+        emptyVideoStream = emptyVideoCanvas.captureStream();
+    }
+
     let context = emptyVideoCanvas.getContext('2d');
     const grd = context.createLinearGradient(0, 0, 170, 0);
     grd.addColorStop(0, "black");
