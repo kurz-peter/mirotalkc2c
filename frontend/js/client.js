@@ -602,7 +602,7 @@ function setupLocalMedia(callback, errorBack) {
 
                     }
 
-                    stream.addTrack(black());
+                    stream.addTrack(black);
 
                     setLocalMedia(stream);
                     if (callback) callback();
