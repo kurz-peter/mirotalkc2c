@@ -587,20 +587,9 @@ function setupLocalMedia(callback, errorBack) {
             if (callback) callback();
         })
         .catch((err) => {
-            console.error('No video source found, falling back to audio only', err);
-            navigator.mediaDevices
-                .getUserMedia({
-                    audio: audioConstraints,
-                })
-                .then((stream) => {
-                    setLocalMedia(stream);
-                    if (callback) callback();
-                })
-                .catch((err) => {
-                    console.error('[Error] access denied for audio/video', err);
-                    handleMediaError('audio/video', err);
-                    if (errorBack) errorBack();
-                });
+            console.error('[Error] access denied for audio/video', err);
+            handleMediaError('audio/video', err);
+            if (errorBack) errorBack();
         });
 }
 
