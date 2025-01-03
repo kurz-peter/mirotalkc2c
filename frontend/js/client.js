@@ -1072,7 +1072,7 @@ async function toggleScreenSharing() {
             console.log('Is my video active before screen sharing: ' + isMyVideoActiveBefore);
         }
         screenMediaPromise = isScreenStreaming
-            ? getCameraOrEmptyVideoStream()
+            ? await getCameraOrEmptyVideoStream()
             : await navigator.mediaDevices.getDisplayMedia(constraints);
         if (screenMediaPromise) {
             localMediaStream.getVideoTracks()[0].stop();
