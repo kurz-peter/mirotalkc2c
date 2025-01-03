@@ -1309,14 +1309,6 @@ function resetVideoConstraints() {
 }
 
 function refreshVideoConstraints() {
-    if(localMediaStream.getVideoTracks().length > 0)
-    {
-        popupMessage(
-            'warning',
-            'No video source',
-            "Your device doesn't support video input.",
-        );
-    }
     localMediaStream
         .getVideoTracks()[0]
         .applyConstraints(getVideoConstraints(videoSource.value))
