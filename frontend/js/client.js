@@ -1351,21 +1351,8 @@ function refreshVideoConstraints() {
 }
 
 function refreshMyLocalVideoStream(stream) {
-    let newTracks = [];
-    if(stream.getVideoTracks().length > 0)
-    {
-        let newVideoTrack = stream.getVideoTracks()[0];
-        newVideoTrack.enabled = true;
-        newTracks.push(newVideoTrack);
-
-    }
-    if(stream.getAudioTracks().length > 0)
-    {
-        let newAudioTrack = stream.getAudioTracks()[0];
-        newTracks.push(newAudioTrack);
-    }
-
-    const newStream = new MediaStream(newTracks);
+    stream.getVideoTracks()[0].enabled = true;
+    const newStream = new MediaStream([stream.getVideoTracks()[0], localMediaStream.getAudioTracks()[0]]);
     localMediaStream = newStream;
     attachMediaStream(myVideo, localMediaStream);
     logStreamSettingsInfo('refreshMyLocalVideoStream', localMediaStream);
