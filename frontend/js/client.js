@@ -277,23 +277,17 @@ function initClient() {
     signalingSocket.on('peerStatus', handlePeerStatus);
     signalingSocket.on('disconnect', handleDisconnect);
     signalingSocket.on('removePeer', handleRemovePeer);
+}
 
-    /*
-    emptyVideoCanvas = document.createElement('canvas');
-    emptyVideoCanvas.width = emptyVideoCanvasWidth;
-    emptyVideoCanvas.height = emptyVideoCanvas.height;
-    */
+function getEmptyVideoStream()
+{
+    emptyVideoStream = emptyVideoCanvas.captureStream();
     let context = emptyVideoCanvas.getContext('2d');
     const grd = context.createLinearGradient(0, 0, 170, 0);
     grd.addColorStop(0, "black");
     grd.addColorStop(1, "white");
     context.fillStyle = grd;
     context.fillRect(0, 0, 64, 64);
-}
-
-function getEmptyVideoStream()
-{
-    emptyVideoStream = emptyVideoCanvas.captureStream();
     return emptyVideoStream;
 }
 
