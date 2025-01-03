@@ -67,6 +67,7 @@ const emptyVideoCanvasHeight = 480;
 let emptyVideoCanvas = false;
 */
 const emptyVideoCanvas = document.getElementById('emptyVideoCanvas');
+let emptyVideoStream = false;
 
 let chatMessages = []; // collect chat messages to save it later
 
@@ -289,6 +290,13 @@ function initClient() {
     context.fillStyle = grd;
     context.fillRect(0, 0, 64, 64);
 }
+
+function getEmptyVideoStream()
+{
+    emptyVideoStream = emptyVideoCanvas.captureStream();
+    return emptyVideoStream;
+}
+
 
 async function sendToServer(msg, config = {}) {
     await signalingSocket.emit(msg, config);
@@ -609,8 +617,7 @@ function setupLocalMedia(callback, errorBack) {
                     audio: audioConstraints,
                 })
                 .then((stream) => {
-                    let emptyVideoStream = emptyVideoCanvas.captureStream();
-                    let emptyVideoTracks = emptyVideoStream.getVideoTracks();
+                    let emptyVideoTracks = getEmptyVideoStream().getVideoTracks();
                     let emptyVideoTrack = emptyVideoTracks[0];
                     stream.addTrack(emptyVideoTrack);
                     setLocalMedia(stream);
@@ -1056,7 +1063,7 @@ async function getCameraOrEmptyVideoStream() {
     try {
         videoStream = await navigator.mediaDevices.getUserMedia({video: true});
     } catch (err) {
-        videoStream = emptyVideoCanvas.captureStream();
+        videoStream = getEmptyVideoStream();
     }
 
     return videoStream;
