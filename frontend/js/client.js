@@ -810,10 +810,10 @@ function handleEvents() {
         toggleHideMe();
     };
     initAudioBtn.onclick = (e) => {
-        setAudioStatus(!localMediaStream.getAudioTracks()[0].enabled, e);
+        setAudioStatus(localMediaStream.getAudioTracks()[0] ? !localMediaStream.getAudioTracks()[0].enabled : false, e);
     };
     initVideoBtn.onclick = (e) => {
-        setVideoStatus(!localMediaStream.getVideoTracks()[0].enabled, e);
+        setVideoStatus(localMediaStream.getVideoTracks()[0] ? !localMediaStream.getVideoTracks()[0].enabled : false, e);
     };
     initSettingsBtn.onclick = () => {
         settingsBtn.click();
