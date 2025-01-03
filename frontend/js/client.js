@@ -279,19 +279,25 @@ function initClient() {
     signalingSocket.on('removePeer', handleRemovePeer);
 }
 
+function updateCanvas() {
+    const randomColor1 = Math.floor(Math.random()*16777215).toString(16);
+    const randomColor2 = Math.floor(Math.random()*16777215).toString(16);
+    let context = emptyVideoCanvas.getContext('2d');
+    const grd = context.createLinearGradient(0, 0, 170, 0);
+    grd.addColorStop(0, "#" + randomColor1);
+    grd.addColorStop(1, "#" + randomColor2);
+    context.fillStyle = grd;
+    context.fillRect(0, 0, 64, 64);
+}
+
 function getEmptyVideoStream()
 {
     if(!emptyVideoStream)
     {
         emptyVideoStream = emptyVideoCanvas.captureStream();
+        setTimeout(() => updateCanvas(), 1000)
     }
 
-    let context = emptyVideoCanvas.getContext('2d');
-    const grd = context.createLinearGradient(0, 0, 170, 0);
-    grd.addColorStop(0, "black");
-    grd.addColorStop(1, "white");
-    context.fillStyle = grd;
-    context.fillRect(0, 0, 64, 64);
     return emptyVideoStream;
 }
 
