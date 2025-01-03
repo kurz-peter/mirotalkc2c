@@ -585,9 +585,30 @@ function setupLocalMedia(callback, errorBack) {
             if (callback) callback();
         })
         .catch((err) => {
-            console.error('[Error] access denied for audio/video', err);
-            handleMediaError('audio/video', err);
-            if (errorBack) errorBack();
+            console.error('No video source found, falling back to audio only', err);
+            navigator.mediaDevices
+                .getUserMedia({
+                    audio: audioConstraints,
+                })
+                .then((stream) => {
+                    let black = ({width = 640, height = 480} = {}) => {
+                        let canvas = Object.assign(document.createElement("canvas"), {width, height});
+                        canvas.getContext('2d').fillRect(0, 0, width, height);
+                        let stream = canvas.captureStream();
+                        return Object.assign(stream.getVideoTracks()[0], {enabled: false});
+
+                    }
+
+                    stream.addTrack(black());
+
+                    setLocalMedia(stream);
+                    if (callback) callback();
+                })
+                .catch((err) => {
+                    console.error('[Error] access denied for audio', err);
+                    handleMediaError('audio/video', err);
+                    if (errorBack) errorBack();
+                });
         });
 }
 
