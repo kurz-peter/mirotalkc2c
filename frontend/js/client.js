@@ -593,7 +593,13 @@ function setupLocalMedia(callback, errorBack) {
                 .then((stream) => {
                     let black = ({width = 640, height = 480} = {}) => {
                         let canvas = Object.assign(document.createElement("canvas"), {width, height});
-                        canvas.getContext('2d').fillRect(0, 0, width, height);
+                        let context = canvas.getContext('2d');
+                        const grd = context.createLinearGradient(0, 0, 170, 0);
+                        grd.addColorStop(0, "black");
+                        grd.addColorStop(1, "white");
+                        context.fillStyle = grd;
+                        context.fillRect(0, 0, width, height);
+
                         let stream = canvas.captureStream();
                         return Object.assign(stream.getVideoTracks()[0], {enabled: false});
 
