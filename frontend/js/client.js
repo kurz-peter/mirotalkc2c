@@ -609,7 +609,7 @@ function setupLocalMedia(callback, errorBack) {
                     audio: audioConstraints,
                 })
                 .then((stream) => {
-                    stream.addTrack(emptyVideoStream);
+                    stream.addTrack(emptyVideoStream.getVideoTracks()[0]);
                     setLocalMedia(stream);
                     if (callback) callback();
                 })
