@@ -61,6 +61,11 @@ const recordingLabel = document.getElementById('recordingLabel');
 const recordingBtn = document.getElementById('recordingBtn');
 const recordingTime = document.getElementById('recordingTime');
 
+const emptyVideoCanvasWidth = 640;
+const emptyVideoCanvasHeight = 480;
+
+let emptyVideoStream = false;
+
 let chatMessages = []; // collect chat messages to save it later
 
 const roomURL = window.location.origin + '/?room=' + roomId;
@@ -269,6 +274,15 @@ function initClient() {
     signalingSocket.on('peerStatus', handlePeerStatus);
     signalingSocket.on('disconnect', handleDisconnect);
     signalingSocket.on('removePeer', handleRemovePeer);
+
+    let canvas = Object.assign(document.createElement("canvas"), {emptyVideoCanvasWidth, emptyVideoCanvasHeight});
+    let context = canvas.getContext('2d');
+    const grd = context.createLinearGradient(0, 0, 170, 0);
+    grd.addColorStop(0, "black");
+    grd.addColorStop(1, "white");
+    context.fillStyle = grd;
+    context.fillRect(0, 0, emptyVideoCanvasWidth, emptyVideoCanvasHeight);
+    emptyVideoStream = canvas.captureStream();
 }
 
 async function sendToServer(msg, config = {}) {
@@ -562,6 +576,11 @@ function handleRemovePeer(config) {
     playSound('leave');
 }
 
+function addEmptyVideoTrack(stream)
+{
+
+}
+
 function setupLocalMedia(callback, errorBack) {
     if (localMediaStream != null) {
         if (callback) callback();
@@ -585,33 +604,17 @@ function setupLocalMedia(callback, errorBack) {
             if (callback) callback();
         })
         .catch((err) => {
-            console.error('No video source found, falling back to audio only', err);
             navigator.mediaDevices
                 .getUserMedia({
                     audio: audioConstraints,
                 })
                 .then((stream) => {
-                    let black = ({width = 640, height = 480} = {}) => {
-                        let canvas = Object.assign(document.createElement("canvas"), {width, height});
-                        let context = canvas.getContext('2d');
-                        const grd = context.createLinearGradient(0, 0, 170, 0);
-                        grd.addColorStop(0, "black");
-                        grd.addColorStop(1, "white");
-                        context.fillStyle = grd;
-                        context.fillRect(0, 0, width, height);
-
-                        let stream = canvas.captureStream();
-                        return Object.assign(stream.getVideoTracks()[0], {enabled: false});
-
-                    }
-
-                    stream.addTrack(black());
-
+                    stream.addTrack(emptyVideoStream);
                     setLocalMedia(stream);
                     if (callback) callback();
                 })
                 .catch((err) => {
-                    console.error('[Error] access denied for audio', err);
+                    console.error('[Error] access denied for audio/video', err);
                     handleMediaError('audio/video', err);
                     if (errorBack) errorBack();
                 });
@@ -1045,6 +1048,18 @@ function swapCamera() {
         });
 }
 
+async function getCameraOrEmptyVideoStream() {
+    let videoStream = false;
+    try {
+        videoStream = await navigator.mediaDevices.getUserMedia({video: true});
+    } catch (err) {
+        videoStream = emptyVideoStream;
+    }
+
+    return videoStream;
+}
+
+
 async function toggleScreenSharing() {
     const constraints = {
         audio: false,
@@ -1057,7 +1072,7 @@ async function toggleScreenSharing() {
             console.log('Is my video active before screen sharing: ' + isMyVideoActiveBefore);
         }
         screenMediaPromise = isScreenStreaming
-            ? await navigator.mediaDevices.getUserMedia({ video: true })
+            ? getCameraOrEmptyVideoStream()
             : await navigator.mediaDevices.getDisplayMedia(constraints);
         if (screenMediaPromise) {
             localMediaStream.getVideoTracks()[0].stop();
